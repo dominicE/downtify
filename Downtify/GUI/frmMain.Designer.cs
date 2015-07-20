@@ -32,6 +32,7 @@
             this.buttonDownload = new System.Windows.Forms.Button();
             this.textBoxLink = new Downtify.GUI.PlaceholderTextBox();
             this.progressBar1 = new Downtify.GUI.TextProgressBar();
+            this.TrackList = new System.Windows.Forms.ListView();
             this.SuspendLayout();
             // 
             // listBoxTracks
@@ -77,11 +78,20 @@
             this.progressBar1.TabIndex = 3;
             this.progressBar1.TotalTracks = 0;
             // 
+            // TrackList
+            // 
+            this.TrackList.Location = new System.Drawing.Point(12, 283);
+            this.TrackList.Name = "TrackList";
+            this.TrackList.Size = new System.Drawing.Size(493, 133);
+            this.TrackList.TabIndex = 4;
+            this.TrackList.UseCompatibleStateImageBehavior = false;
+            // 
             // frmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(517, 275);
+            this.ClientSize = new System.Drawing.Size(517, 428);
+            this.Controls.Add(this.TrackList);
             this.Controls.Add(this.progressBar1);
             this.Controls.Add(this.buttonDownload);
             this.Controls.Add(this.textBoxLink);
@@ -105,6 +115,7 @@
         private Downtify.GUI.PlaceholderTextBox textBoxLink;
         private System.Windows.Forms.Button buttonDownload;
         private Downtify.GUI.TextProgressBar progressBar1;
+        private System.Windows.Forms.ListView TrackList;
     }
 }
 

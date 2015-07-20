@@ -63,13 +63,25 @@ namespace Downtify.GUI
 
         private void frmMain_Load(object sender, EventArgs e)
         {
-            EnableControls(false);
+            EnableControls(true);
         }
 
         private async void frmMain_Shown(object sender, EventArgs e)
         {
             System.Threading.Thread.Sleep(200);
             this.Activate();
+
+            TrackList.View = View.Details;
+            TrackList.GridLines = true;
+            TrackList.FullRowSelect = true;
+
+            TrackList.Columns.Add("Title", 100);
+            TrackList.Columns.Add("Artist", 50);
+            TrackList.Columns.Add("Album", 50);
+
+            String[] test = { "Hallo", "Ich", "Bins" };
+            TrackList.Items.Add(new ListViewItem(test));
+            TrackList.Items.Add(new ListViewItem(test));
 
             string username = "", password = "";
             TransferConfig();
@@ -146,7 +158,7 @@ namespace Downtify.GUI
             if (!isLoggedIn)
             {
                 MessageBox.Show(lang.GetString("error/no_premium"), lang.GetString("title/error"));
-                Application.Exit();
+                //Application.Exit();
                 return;
             }
 
@@ -222,11 +234,23 @@ namespace Downtify.GUI
                     link = BuildSpotifyURI(link);
                 }
 
+                TrackItem trackItem;
+                ListViewItem item;
+                String itemTitle, itemArtist, itemAlbum;
+
                 if (link.ToLower().Contains("playlist"))
                 {
                     var playlist = await downloader.FetchPlaylist(link);
                     for (int i = 0; i < playlist.NumTracks(); i++)
-                        listBoxTracks.Items.Add(new TrackItem(playlist.Track(i)));
+                    {
+                        trackItem = new TrackItem(playlist.Track(i));
+                        listBoxTracks.Items.Add(trackItem);
+                        itemTitle = trackItem.Track.Name();
+                        itemArtist = trackItem.Track.Artist(0).Name();
+                        itemAlbum = trackItem.Track.Album().Name();
+                        item = new ListViewItem(new String[]{itemTitle, itemArtist, itemAlbum});
+                        item.Tag = trackItem;
+                    }
                     textBoxLink.Clear();
                 }
                 else if (link.ToLower().Contains("track"))
