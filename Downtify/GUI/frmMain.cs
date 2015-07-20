@@ -30,24 +30,20 @@ namespace Downtify.GUI
         // Very ugly, todo: move parts of this to the downloader class
         private void downloader_OnDownloadComplete(bool successfully)
         {
-            var list = new object[listBoxTracks.SelectedItems.Count];
-            for (int i = 1; i < listBoxTracks.SelectedItems.Count; i++)
-                list[i - 1] = listBoxTracks.SelectedItems[i];
-
-            listBoxTracks.SelectedItems.Clear();
-
-            foreach (var track in list)
-                listBoxTracks.SelectedItems.Add(track);
-
-            if (listBoxTracks.SelectedItems.Count == 0)
+            if (successfully)
             {
-                listBoxTracks.SelectedItems.Clear();
+                TrackList.SelectedItems[0].Selected = false;
+            }
+
+            if (TrackList.SelectedItems.Count == 0)
+            {
+                TrackList.SelectedItems.Clear();
                 MessageBox.Show(lang.GetString("download/done"));
                 EnableControls(true);
                 return;
             }
             progressBar1.CurrentTrack++;
-            downloader.Download(((TrackItem)listBoxTracks.SelectedItems[0]).Track);
+            downloader.Download(((TrackItem)TrackList.SelectedItems[0].Tag).Track);
         }
 
         private void downloader_OnDownloadProgress(int value)
@@ -57,7 +53,7 @@ namespace Downtify.GUI
                 if (value > 100 || value < 0)
                     return;
 
-                 progressBar1.Value = value;
+                progressBar1.Value = value;
             });
         }
 
@@ -75,13 +71,10 @@ namespace Downtify.GUI
             TrackList.GridLines = true;
             TrackList.FullRowSelect = true;
 
+            TrackList.Columns.Add("#", 30);
             TrackList.Columns.Add("Title", 100);
             TrackList.Columns.Add("Artist", 50);
             TrackList.Columns.Add("Album", 50);
-
-            String[] test = { "Hallo", "Ich", "Bins" };
-            TrackList.Items.Add(new ListViewItem(test));
-            TrackList.Items.Add(new ListViewItem(test));
 
             string username = "", password = "";
             TransferConfig();
@@ -110,8 +103,8 @@ namespace Downtify.GUI
                 if (File.Exists("download.xml"))
                     File.Delete("download.xml");
                 List<string> tracks = new List<string>();
-                foreach (TrackItem track in listBoxTracks.SelectedItems)
-                    tracks.Add(SpotifySharp.Link.CreateFromTrack(track.Track, 0).AsString());
+                foreach (ListViewItem track in TrackList.SelectedItems)
+                    tracks.Add(SpotifySharp.Link.CreateFromTrack(((TrackItem)track.Tag).Track, 0).AsString());
                 if (tracks.Count > 0)
                 {
                     XmlDocument doc = new XmlDocument();
@@ -130,10 +123,10 @@ namespace Downtify.GUI
 
         private void TransferConfig()
         {
-            if(File.Exists("config.txt"))
+            if (File.Exists("config.txt"))
             {
                 string username = "", password = "";
-                foreach(var currentLine in File.ReadAllLines("config.txt"))
+                foreach (var currentLine in File.ReadAllLines("config.txt"))
                 {
                     var line = currentLine.Trim();
                     if (line.StartsWith("#"))
@@ -176,44 +169,21 @@ namespace Downtify.GUI
             await AddDownload(textBoxLink.Text);
         }
 
-        private void listBoxTracks_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.KeyCode == Keys.Delete)
-            {
-                if (listBoxTracks.SelectedItems.Count == 0)
-                    return;
-
-                var list = new TrackItem[listBoxTracks.SelectedItems.Count];
-                listBoxTracks.SelectedItems.CopyTo(list, 0);
-
-                foreach (var track in list)
-                    listBoxTracks.Items.Remove(track);
-            }
-            else if (e.KeyCode == Keys.A && e.Control)
-            {
-                var list = new TrackItem[listBoxTracks.Items.Count];
-                listBoxTracks.Items.CopyTo(list, 0);
-
-                listBoxTracks.SelectedItems.Clear();
-                foreach (var track in list)
-                    listBoxTracks.SelectedItems.Add(track);
-            }
-        }
-
         private void buttonDownload_Click(object sender, EventArgs e)
         {
-            if (listBoxTracks.SelectedItems.Count == 0)
+            if (TrackList.SelectedItems.Count == 0)
             {
-                MessageBox.Show(lang.GetString("error/no_download_selection"), lang.GetString("title/error"));
+                progressBar1.Text = lang.GetString("error/no_download_selection");
+                progressBar1.ShowText = true;
                 return;
             }
 
-            progressBar1.TotalTracks = listBoxTracks.SelectedItems.Count;
+            progressBar1.TotalTracks = TrackList.SelectedItems.Count;
             progressBar1.CurrentTrack = 1;
             progressBar1.ShowText = true;
 
             EnableControls(false);
-            downloader.Download(((TrackItem)listBoxTracks.SelectedItems[0]).Track);
+            downloader.Download(((TrackItem)TrackList.SelectedItems[0].Tag).Track);
         }
 
         private async Task AddDownload(string link)
@@ -236,7 +206,7 @@ namespace Downtify.GUI
 
                 TrackItem trackItem;
                 ListViewItem item;
-                String itemTitle, itemArtist, itemAlbum;
+                String itemNumber, itemTitle, itemArtist, itemAlbum;
 
                 if (link.ToLower().Contains("playlist"))
                 {
@@ -244,28 +214,44 @@ namespace Downtify.GUI
                     for (int i = 0; i < playlist.NumTracks(); i++)
                     {
                         trackItem = new TrackItem(playlist.Track(i));
-                        listBoxTracks.Items.Add(trackItem);
+                        itemNumber = trackItem.Track.Index().ToString();
                         itemTitle = trackItem.Track.Name();
                         itemArtist = trackItem.Track.Artist(0).Name();
                         itemAlbum = trackItem.Track.Album().Name();
-                        item = new ListViewItem(new String[]{itemTitle, itemArtist, itemAlbum});
+                        item = new ListViewItem(new String[] { itemNumber, itemTitle, itemArtist, itemAlbum });
                         item.Tag = trackItem;
+                        TrackList.Items.Add(item);
                     }
-                    textBoxLink.Clear();
                 }
                 else if (link.ToLower().Contains("track"))
                 {
                     var track = await downloader.FetchTrack(link);
-                    listBoxTracks.Items.Add(new TrackItem(track));
-                    textBoxLink.Clear();
+                    trackItem = new TrackItem(track);
+                    itemNumber = trackItem.Track.Index().ToString();
+                    itemTitle = trackItem.Track.Name();
+                    itemArtist = trackItem.Track.Artist(0).Name();
+                    itemAlbum = trackItem.Track.Album().Name();
+                    item = new ListViewItem(new String[] { itemNumber, itemTitle, itemArtist, itemAlbum });
+                    item.Tag = trackItem;
+                    TrackList.Items.Add(item);
                 }
                 else if (link.ToLower().Contains("album"))
                 {
                     var album = await downloader.FetchAlbum(link);
                     for (int i = 0; i < album.NumTracks(); i++)
-                        listBoxTracks.Items.Add(new TrackItem(album.Track(i)));
-                    textBoxLink.Clear();
+                    {
+                        trackItem = new TrackItem(album.Track(i));
+                        itemNumber = trackItem.Track.Index().ToString();
+                        itemTitle = trackItem.Track.Name();
+                        itemArtist = trackItem.Track.Artist(0).Name();
+                        itemAlbum = trackItem.Track.Album().Name();
+                        item = new ListViewItem(new String[] { itemNumber, itemTitle, itemArtist, itemAlbum });
+                        item.Tag = trackItem;
+                        TrackList.Items.Add(item);
+                    }
                 }
+                textBoxLink.Clear();
+                TrackList.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
             }
             catch (NullReferenceException)
             {
@@ -292,6 +278,17 @@ namespace Downtify.GUI
                 uri = "spotify:" + uid + type + ":" + tid;
             }
             return uri;
+        }
+
+        private void TrackList_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Control && e.KeyCode == Keys.A)
+            {
+                foreach (ListViewItem item in TrackList.Items)
+                {
+                    item.Selected = true;
+                }
+            }
         }
     }
 }
