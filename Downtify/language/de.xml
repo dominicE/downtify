@@ -1,16 +1,21 @@
 <lang>
-    <title>
-        <error>Fehler</error>
-    </title>
-    <download>
-        <paste_uri>Füge hier deinen Track, Playlist oder Album link ein</paste_uri>
-        <done>Download abgeschlossen</done>
-        <progression>Download Track: {0} von {1}</progression>
-    </download>
-    <error>
-        <no_premium>Fehler beim einloggen. Besitzt du Spotify Premium?</no_premium>
-        <invalid_uri>Bitte verwende 'Spotify URI kopieren' und füge dann den link oben erneut ein</invalid_uri>
-        <no_download_selection>Bitte wähle die Songs oben aus, die du herunterladen möchtest</no_download_selection>
-        <connection_lost>Die Verbindung zu Spotify wurde unterbrochen.</connection_lost>
-    </error>
+  <title>
+    <error>Fehler</error>
+  </title>
+  <download>
+    <paste_uri>Füge hier deinen Track, Playlist oder Album link ein</paste_uri>
+    <done>Download abgeschlossen</done>
+    <progression>Download Track: {0} von {1}</progression>
+  </download>
+  <error>
+    <no_premium>Fehler beim einloggen. Besitzt du Spotify Premium?</no_premium>
+    <invalid_uri>Bitte verwende 'Spotify URI kopieren' und füge dann den link oben erneut ein</invalid_uri>
+    <no_download_selection>Bitte wähle die Songs oben aus, die du herunterladen möchtest</no_download_selection>
+    <connection_lost>Die Verbindung zu Spotify wurde unterbrochen.</connection_lost>
+  </error>
+  <tracklist>
+    <track>Titel</track>
+    <artist>Interpret</artist>
+    <album>Album</album>
+  </tracklist>
 </lang>

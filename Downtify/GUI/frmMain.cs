@@ -71,11 +71,6 @@ namespace Downtify.GUI
             TrackList.GridLines = true;
             TrackList.FullRowSelect = true;
 
-            TrackList.Columns.Add("#", 30);
-            TrackList.Columns.Add("Title", 100);
-            TrackList.Columns.Add("Artist", 50);
-            TrackList.Columns.Add("Album", 50);
-
             string username = "", password = "";
             TransferConfig();
             username = configuration.GetConfiguration("username");
@@ -84,6 +79,11 @@ namespace Downtify.GUI
 
             textBoxLink.Placeholder = lang.GetString("download/paste_uri");
             progressBar1.Text = lang.GetString("download/progression");
+
+            TrackList.Columns.Add("#", 30);
+            TrackList.Columns.Add(lang.GetString("tracklist/track"), 100);
+            TrackList.Columns.Add(lang.GetString("tracklist/artist"), 100);
+            TrackList.Columns.Add(lang.GetString("tracklist/album"), 100);
 
             downloader.Login(username, password);
 
@@ -189,10 +189,8 @@ namespace Downtify.GUI
         {
             try
             {
-                EnableControls(false);
-
                 //Validate pasted URI
-                if (link.Length > 0 && !link.ToLower().StartsWith("spotify:") && !link.Contains("play.spotify.com"))
+                if (link.Length >= 0 && !link.ToLower().StartsWith("spotify:") && !link.Contains("play.spotify.com"))
                 {
                     MessageBox.Show(lang.GetString("download/invalid_uri"));
                     textBoxLink.Clear();
@@ -202,6 +200,8 @@ namespace Downtify.GUI
                 {
                     link = BuildSpotifyURI(link);
                 }
+
+                EnableControls(false);
 
                 TrackItem trackItem;
                 ListViewItem item;
