@@ -151,7 +151,7 @@ namespace Downtify.GUI
             if (!isLoggedIn)
             {
                 MessageBox.Show(lang.GetString("error/no_premium"), lang.GetString("title/error"));
-                //Application.Exit();
+                Application.Exit();
                 return;
             }
 
@@ -173,8 +173,7 @@ namespace Downtify.GUI
         {
             if (TrackList.SelectedItems.Count == 0)
             {
-                progressBar1.Text = lang.GetString("error/no_download_selection");
-                progressBar1.ShowText = true;
+                MessageBox.Show(lang.GetString("error/no_download_selection"), lang.GetString("title/error"));          
                 return;
             }
 
