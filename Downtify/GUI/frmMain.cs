@@ -59,7 +59,7 @@ namespace Downtify.GUI
 
         private void frmMain_Load(object sender, EventArgs e)
         {
-            EnableControls(true);
+            EnableControls(false);
         }
 
         private async void frmMain_Shown(object sender, EventArgs e)
@@ -173,7 +173,7 @@ namespace Downtify.GUI
         {
             if (TrackList.SelectedItems.Count == 0)
             {
-                MessageBox.Show(lang.GetString("error/no_download_selection"), lang.GetString("title/error"));          
+                MessageBox.Show(lang.GetString("error/no_download_selection"), lang.GetString("title/error"));
                 return;
             }
 
